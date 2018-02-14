@@ -1,0 +1,56 @@
+# Makefile for creating C program / Arduino code
+
+FLOW := C
+
+###################### ARDUINO ######################
+ifeq ($(FLOW),ARD)
+#ARDUINO_LIBS = Wire
+
+include /usr/share/arduino/Arduino.mk
+
+else 
+
+###################### DragonBoard ######################
+#Libs
+PROGRAM = exe_DB_for_arduino
+_OBJ = \
+	analogInput.o
+OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+
+#Flags
+CC = gcc
+#CPPFLAGS = -g -Wall -pedantic
+LIBS = -lsoc
+
+ODIR=obj
+DB_DIR = db_src
+CFLAGS=-I$(DB_DIR)
+
+RM = rm -rf
+
+# making all progs
+all: main
+complete: clean main run
+
+#compiling each c file to obj
+$(ODIR)/%.o: $(DB_DIR)/%.c $(ODIR)
+	$(CC) -c $< -o $@ $(CFLAGS) $(LIBS)
+
+# making exe from objs
+main: $(OBJ)
+	$(CC) -o $(PROGRAM) $(OBJ) $(CFLAGS) $(LIBS)
+
+run: main
+	./$(PROGRAM)
+
+
+# prepare dir
+$(ODIR):
+	mkdir -p $(ODIR)
+
+
+#cleaning
+clean:
+	$(RM) $(ODIR) *.bak *~* "#"* core main flat *.cpp.* *.h.* $(PROGRAM)
+
+endif

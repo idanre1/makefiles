@@ -1,0 +1,43 @@
+# Makefile for creating C program / Arduino code
+
+FLOW := C
+
+ifeq ($(FLOW),"ARD")
+#ARDUINO_LIBS = Wire
+
+include /usr/share/arduino/Arduino.mk
+
+else 
+
+#Libs
+PROGRAM = exe_arduino
+OBJS = \
+	arduino-i2c.o
+
+#Flags
+CC = gcc
+#CPPFLAGS = -g -Wall -pedantic
+LIBS = -lsoc
+RM = rm -f
+
+# making all progs
+all: main
+complete: clean main run
+
+# Linking the final sim
+main: $(OBJS)
+	$(CC) -o $(PROGRAM) $(OBJS) $(LIBS)
+
+run: main
+	./$(PROGRAM)
+
+
+#compiling
+%: %.c
+	$(CC) -c $@.c -o $@.o $(LIBS)
+
+#cleaning
+clean:
+	$(RM) *.o *.bak *~* "#"* core main flat *.cpp.* *.h.* $(PROGRAM)
+
+endif
